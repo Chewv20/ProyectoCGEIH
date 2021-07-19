@@ -1,12 +1,13 @@
-#ifndef MESH_H
-#define MESH_H
+#ifndef MESH_ANIM_H
+#define MESH_ANIM_H
 
-//#include "glad.h"// holds all OpenGL type declarations
+//#include <glad.h>// holds all OpenGL type declarations
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "shader.h"
+#include "mesh.h"
 
 #include <string>
 #include <fstream>
@@ -15,40 +16,67 @@
 #include <vector>
 using namespace std;
 
-struct Vertex {
-    // position
-    glm::vec3 Position;
-    // normal
-    glm::vec3 Normal;
-    // texCoords
-    glm::vec2 TexCoords;
-    // tangent
-    glm::vec3 Tangent;
-    // bitangent
-    glm::vec3 Bitangent;
+typedef unsigned int uint;
+#define NUM_BONES_PER_VEREX 4
+
+struct BoneMatrix
+{
+	aiMatrix4x4 offset_matrix;
+	aiMatrix4x4 final_world_transform;
 };
 
-struct Texture {
-    unsigned int id;
-    string type;
-    string path;
+struct VertexBoneData
+{
+	uint ids[NUM_BONES_PER_VEREX];   // we have 4 bone ids for EACH vertex & 4 weights for EACH vertex
+	float weights[NUM_BONES_PER_VEREX];
+
+	VertexBoneData()
+	{
+		memset(ids, 0, sizeof(ids));    // init all values in array = 0
+		memset(weights, 0, sizeof(weights));
+	}
+
+	void addBoneData(uint bone_id, float weight)
+	{
+		for (uint i = 0; i < NUM_BONES_PER_VEREX; i++)
+		{
+			if (weights[i] == 0.0)
+			{
+				ids[i] = bone_id;
+				weights[i] = weight;
+				return;
+			}
+		}
+	}
 };
 
-class Mesh {
+class MeshAnim {
 public:
     /*  Mesh Data  */
     vector<Vertex> vertices;
     vector<unsigned int> indices;
     vector<Texture> textures;
+	vector<VertexBoneData> bones_id_weights_for_each_vertex;
     unsigned int VAO;
 
     /*  Functions  */
     // constructor
-    Mesh(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
+	MeshAnim(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures)
+	{
+		this->vertices = vertices;
+		this->indices = indices;
+		this->textures = textures;
+
+		// now that we have all the required data, set the vertex buffers and its attribute pointers.
+		setupMesh();
+	}
+
+    MeshAnim(vector<Vertex> vertices, vector<unsigned int> indices, vector<Texture> textures, vector<VertexBoneData> bone_id_weights)
     {
         this->vertices = vertices;
         this->indices = indices;
         this->textures = textures;
+		bones_id_weights_for_each_vertex = bone_id_weights;
 
         // now that we have all the required data, set the vertex buffers and its attribute pointers.
         setupMesh();
@@ -94,7 +122,7 @@ public:
 
 private:
     /*  Render data  */
-    unsigned int VBO, EBO;
+    unsigned int VBO, EBO, VBO_bones;
 
     /*  Functions    */
     // initializes all the buffer objects/arrays
@@ -104,6 +132,7 @@ private:
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
+		glGenBuffers(1, &VBO_bones);
 
         glBindVertexArray(VAO);
         // load data into vertex buffers
@@ -111,11 +140,18 @@ private:
         // A great thing about structs is that their memory layout is sequential for all its items.
         // The effect is that we can simply pass a pointer to the struct and it translates perfectly to a glm::vec3/2 array which
         // again translates to 3/2 floats which translates to a byte array.
-        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);  
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
 
+		// bones
+		glBindBuffer(GL_ARRAY_BUFFER, VBO_bones);
+		glBufferData(GL_ARRAY_BUFFER, bones_id_weights_for_each_vertex.size() * sizeof(bones_id_weights_for_each_vertex[0]), &bones_id_weights_for_each_vertex[0], GL_STATIC_DRAW);
+
+		// indices
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
+		// Se liga primero el buffer de los vertices
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
         // set the vertex attribute pointers
         // vertex Positions
         glEnableVertexAttribArray(0);	
@@ -133,6 +169,15 @@ private:
         glEnableVertexAttribArray(4);
         glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
 
+		// Se liga el buffer de los bones
+		glBindBuffer(GL_ARRAY_BUFFER, VBO_bones);
+		// set the bones atrribute pointers
+		glEnableVertexAttribArray(5);
+		glVertexAttribIPointer(5, 4, GL_INT, sizeof(VertexBoneData), (void*)0);
+		glEnableVertexAttribArray(6);
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(VertexBoneData), (void*)offsetof(VertexBoneData, weights));
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBindVertexArray(0);
     }
 };
