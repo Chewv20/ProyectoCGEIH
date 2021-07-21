@@ -51,9 +51,14 @@ glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 glm::vec3 PosIni(0.0f, 1.0f, 0.0f);
 glm::vec3 lightDirection(0.0f, -1.0f, -1.0f);
 
-bool active1;
-bool active2;
-
+bool activeLuz1 = false;
+bool activeLuz2 = false;
+bool activeVent1 = false;
+bool activeVent2 = false;
+float rotVent1 = 0.0;
+float rotVent2 = 0.0;
+bool velocidad1 = false;
+bool velocidad2 = false;
 
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
@@ -200,9 +205,13 @@ int main( )
     Model Coche((char*)"Models/Coche/Coche.obj");
     Model Silla((char*)"Models/Silla/Silla.obj");
     Model Ventilador((char*)"Models/Lampara/VentiladorLampara.obj");
-    
-    
-    
+    Model Cama((char*)"Models/Cama/Cama.obj");
+    Model Estufa((char*)"Models/Estufa/Estufa.obj");
+    Model Lampara((char*)"Models/Lampara/Lampara.obj");
+    Model Refri((char*)"Models/Refri/Refri.obj");
+    Model Mueble((char*)"Models/MueblesX/Mueble.obj");
+    Model Sofa((char*)"Models/Sofa/Sofa.obj");
+
     glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
     
     GLfloat vertices[] =
@@ -424,62 +433,108 @@ int main( )
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Piso.Draw(lightingShader);
 
+        //Comedor
         model = glm::mat4(1);
         model = glm::translate(model, glm::vec3(-0.5f, 0.01f, 0.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Mesa.Draw(lightingShader);
 
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(-2.0f, -20.5f, 9.0f));
+        model = glm::translate(model, glm::vec3(-2.0f, -20.3f, 9.0f));
         model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Silla.Draw(lightingShader);
 
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(-2.0f, -20.5f, 14.0f));
+        model = glm::translate(model, glm::vec3(-2.0f, -20.3f, 14.0f));
         model = glm::rotate(model, glm::radians(270.0f), glm::vec3(0.0f, 1.0f, 0.0));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Silla.Draw(lightingShader);
 
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(-12.0f, -20.5f, 3.5f));
+        model = glm::translate(model, glm::vec3(-12.0f, -20.3f, 3.5f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Silla.Draw(lightingShader);
 
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(-12.0f, -20.5f, 8.5f));
+        model = glm::translate(model, glm::vec3(-12.0f, -20.3f, 8.5f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Silla.Draw(lightingShader);
 
         model = glm::mat4(1);
         model = glm::translate(model, glm::vec3(-5.0f, -7.9f, 9.0f));
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, rotVent2, glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Ventilador.Draw(lightingShader);
 
+        //Sala
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(13.0f, -19.0f, 15.0f));
+        model = glm::translate(model, glm::vec3(13.0f, -17.18f, 15.0f));
         model = glm::rotate(model, glm::radians(235.0f), glm::vec3(0.0f, 1.0f, 0.0));
         model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Television.Draw(lightingShader);
 
         model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(13.0f, -20.3, 15.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Mueble.Draw(lightingShader);
+
+        model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(13.9f, -19.3f, 3.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Lampara.Draw(lightingShader);
+
+        model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(13.9f, -20.3f, 3.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Mueble.Draw(lightingShader);
+
+        model = glm::mat4(1);
         model = glm::translate(model, glm::vec3(7.0f, -7.9f, 9.0f));
-        model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, rotVent1, glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.5f, 1.5f, 1.5f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Ventilador.Draw(lightingShader);
 
         model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(6.0f, -20.3f, 7.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Sofa.Draw(lightingShader);
+
+        model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(6.0f, -20.3f, 20.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Sofa.Draw(lightingShader);
+
+        //Cochera
+        model = glm::mat4(1);
         model = glm::translate(model, glm::vec3(2.0f, -23.2f, -27.0f));
         model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
         model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        Coche.Draw(lightingShader);     
+        Coche.Draw(lightingShader);  
+
+        //Cuarto
+        model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(12.0f, -20.0f, -11.3f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Cama.Draw(lightingShader);
+
+        //Cocina
+        model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(-13.0f, -20.0f, -9.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Estufa.Draw(lightingShader);
+
+        model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(-13.0f, -20.0f, -2.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Refri.Draw(lightingShader);
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -573,6 +628,20 @@ void animacion()
         }
 
     }
+
+    if (activeVent1) {
+        if (velocidad1)
+            rotVent1 += 0.05;
+        else
+            rotVent1 += 0.1;
+    }
+    if (activeVent2) {
+        if (velocidad2)
+            rotVent2 += 0.05;
+        else
+            rotVent2 += 0.1;
+    }
+
 }
 
 
@@ -629,21 +698,43 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 
     if (keys[GLFW_KEY_1])
     {
-        active1 = !active1;
-        if (active1)
-            LightP1 = glm::vec3(0.984f, 0.992f, 0.427f);
-        else
+        activeLuz1 = !activeLuz1;
+        if (activeLuz1) {
+            LightP1 = glm::vec3(0.984f, 0.992f, 0.427f); 
+        } 
+        else {
             LightP1 = glm::vec3(0.0f, 0.0f, 0.0f);
+        }
+            
     }
 
     if (keys[GLFW_KEY_2])
     {
-        active2 = !active2;
-        if (active2)
+        activeLuz2 = !activeLuz2;
+        if (activeLuz2) {
             LightP2 = glm::vec3(0.984f, 0.992f, 0.427f);
-        else
+        }
+            
+        else {
             LightP2 = glm::vec3(0.0f, 0.0f, 0.0f);
+        }
+            
     }
+
+    if (keys[GLFW_KEY_3])
+        activeVent1 = !activeVent1;
+
+    if (keys[GLFW_KEY_4])
+        activeVent2 = !activeVent2;
+
+    if (keys[GLFW_KEY_KP_ADD]) {
+        velocidad1 = !velocidad1;
+    }
+
+    if (keys[GLFW_KEY_KP_SUBTRACT]) {
+        velocidad2 = !velocidad2;
+    }
+
 }
 
 void MouseCallback(GLFWwindow* window, double xPos, double yPos)
@@ -668,9 +759,6 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 // Moves/alters the camera positions based on user input
 void DoMovement()
 {
-
-
-
     // Camera controls
     if (keys[GLFW_KEY_W] || keys[GLFW_KEY_UP])
     {
@@ -696,11 +784,5 @@ void DoMovement()
     {
         camera.ProcessKeyboard(RIGHT, deltaTime);
     }
-
-
-
-
-
-
 }
 
