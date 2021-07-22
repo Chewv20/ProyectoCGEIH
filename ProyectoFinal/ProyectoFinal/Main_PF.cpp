@@ -53,6 +53,8 @@ glm::vec3 lightDirection(0.0f, -1.0f, -1.0f);
 
 bool activeLuz1 = false;
 bool activeLuz2 = false;
+bool activeLuz3 = false;
+bool activeLuz4 = false;
 bool activeVent1 = false;
 bool activeVent2 = false;
 float rotVent1 = 0.0;
@@ -93,14 +95,40 @@ int playIndex = 0;
 glm::vec3 pointLightPositions[] = {
     glm::vec3(7.0f, -8.5f, 9.0f),
     glm::vec3(-5.0f, -8.5f, 9.0f),
-    glm::vec3(10.0f,10.0f,10.0f),
-    glm::vec3(10.0f,10.0f,10.0f)
+    glm::vec3(8.0f, -6.0f, -9.0f),
+    glm::vec3(-8.0f, -6.0f, -6.0f)
 };
 
 glm::vec3 LightP1;
 glm::vec3 LightP2;
+glm::vec3 LightP3;
+glm::vec3 LightP4;
 
+glm::vec3 posIniP(-13.0f, -18.0f, -9.0f);
+glm::vec3 posIniC(10.0f, -10.0f, -20.0f);
 
+float movPizzaX = 0.0f;
+float movPizzaZ = 0.0f;
+float movPizzaY = 0.0f;
+
+bool circuitoP = false;
+bool recorridoP1 = true;
+bool recorridoP2 = false;
+bool recorridoP3 = false;
+bool recorridoP4 = false;
+bool recorridoP5 = false;
+
+bool circuitoC = false;
+bool recorridoC1 = true;
+bool recorridoC2 = false;
+bool recorridoC3 = false;
+bool recorridoC4 = false;
+bool recorridoC5 = false;
+
+float movCX = 0.0f;
+float movCZ = 0.0f;
+float movCY = 0.0f;
+float rotC  = 0.0f;
 
 void saveFrame(void)
 {
@@ -211,80 +239,17 @@ int main( )
     Model Refri((char*)"Models/Refri/Refri.obj");
     Model Mueble((char*)"Models/MueblesX/Mueble.obj");
     Model Sofa((char*)"Models/Sofa/Sofa.obj");
+    Model LamparaTecho((char*)"Models/Lampara/LamparaTecho.obj");
+    Model Pizza((char*)"Models/Pizza/pizza.obj");
+    Model Escoba((char*)"Models/Escoba/Escoba.obj");
 
     glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
-    
-    GLfloat vertices[] =
-    {
-        // Positions            // Normals              // Texture Coords
-        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,     0.0f,  0.0f,
-        0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,     1.0f,  0.0f,
-        0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,     1.0f,  1.0f,
-        0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,     1.0f,  1.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  0.0f, -1.0f,     0.0f,  1.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f,  0.0f, -1.0f,     0.0f,  0.0f,
-
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f,  1.0f,     0.0f,  0.0f,
-        0.5f, -0.5f,  0.5f,     0.0f,  0.0f,  1.0f,     1.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,     0.0f,  0.0f,  1.0f,     1.0f,  1.0f,
-        0.5f,  0.5f,  0.5f,     0.0f,  0.0f,  1.0f,  	1.0f,  1.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  0.0f,  1.0f,     0.0f,  1.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f,  0.0f,  1.0f,     0.0f,  0.0f,
-
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,    1.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,    1.0f,  1.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,    0.0f,  1.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,    0.0f,  1.0f,
-        -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,    0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,    1.0f,  0.0f,
-
-        0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,     1.0f,  0.0f,
-        0.5f,  0.5f, -0.5f,     1.0f,  0.0f,  0.0f,     1.0f,  1.0f,
-        0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,     0.0f,  1.0f,
-        0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,     0.0f,  1.0f,
-        0.5f, -0.5f,  0.5f,     1.0f,  0.0f,  0.0f,     0.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,     1.0f,  0.0f,
-
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,     0.0f,  1.0f,
-        0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,     1.0f,  1.0f,
-        0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,     1.0f,  0.0f,
-        0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,     1.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,     0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,     0.0f,  1.0f,
-
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,     0.0f,  1.0f,
-        0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,     1.0f,  1.0f,
-        0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,     1.0f,  0.0f,
-        0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,     1.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,     0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,     0.0f,  1.0f
-    };
-
-    GLuint indices[] =
-    {  // Note that we start from 0!
-        0,1,2,3,
-        4,5,6,7,
-        8,9,10,11,
-        12,13,14,15,
-        16,17,18,19,
-        20,21,22,23,
-        24,25,26,27,
-        28,29,30,31,
-        32,33,34,35
-    };
 
     // First, set the container's VAO (and VBO)
     GLuint VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     // Position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
@@ -369,18 +334,18 @@ int main( )
 
         // Point light 3
         glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].position"), pointLightPositions[2].x, pointLightPositions[2].y, pointLightPositions[2].z);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), 0.0f, 0.0f, 0.0f);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), 0.0f, 0.0f, 0.0f);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), 0.0f, 0.0f, 0.0f);
+        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].ambient"), 0.01f, 0.01f, 0.01f);
+        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].diffuse"), LightP3.x, LightP3.y, LightP3.z);
+        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[2].specular"), LightP3.x, LightP3.y, LightP3.z);
         glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].constant"), 1.0f);
         glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].linear"), 0.09f);
         glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[2].quadratic"), 0.032f);
 
         // Point light 4
         glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].position"), pointLightPositions[3].x, pointLightPositions[3].y, pointLightPositions[3].z);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].ambient"), 0.0f, 0.0f, 0.0f);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].diffuse"), 0.0f, 0.0f, 0.0f);
-        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].specular"), 0.0f, 0.0f, 0.0f);
+        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].ambient"), 0.01f, 0.01f, 0.01f);
+        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].diffuse"), LightP4.x, LightP4.y, LightP4.z);
+        glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[3].specular"), LightP4.x, LightP4.y, LightP4.z);
         glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].constant"), 1.0f);
         glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].linear"), 0.09f);
         glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[3].quadratic"), 0.032f);
@@ -414,13 +379,9 @@ int main( )
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-
-
-
         glBindVertexArray(VAO);
         glm::mat4 tmp = glm::mat4(1.0f); //Temp
         glm::mat4 model(1);
-
 
         //Carga de modelo 
         //Personaje
@@ -501,29 +462,39 @@ int main( )
         Ventilador.Draw(lightingShader);
 
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(6.0f, -20.3f, 7.0f));
+        model = glm::translate(model, glm::vec3(4.0f, -20.3f, 7.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Sofa.Draw(lightingShader);
 
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(6.0f, -20.3f, 20.0f));
+        model = glm::translate(model, glm::vec3(7.0f, -20.3f, 15.0f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Sofa.Draw(lightingShader);
 
         //Cochera
         model = glm::mat4(1);
-        model = glm::translate(model, glm::vec3(2.0f, -23.2f, -27.0f));
-        model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0));
+        model = glm::translate(model, glm::vec3(2.0f, -20.3f, -23.0f));
         model = glm::scale(model, glm::vec3(3.0f, 3.0f, 3.0f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-        Coche.Draw(lightingShader);  
+        Coche.Draw(lightingShader); 
+
+        model = glm::mat4(1);
+        model = glm::translate(model, posIniC + glm::vec3(movCX, movCY, movCZ));
+        model = glm::rotate(model, glm::radians(rotC), glm::vec3(0.0f, 1.0f, 0.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Escoba.Draw(lightingShader);
 
         //Cuarto
         model = glm::mat4(1);
         model = glm::translate(model, glm::vec3(12.0f, -20.0f, -11.3f));
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Cama.Draw(lightingShader);
+
+        model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(8.0f, -5.8f, -9.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        LamparaTecho.Draw(lightingShader);
 
         //Cocina
         model = glm::mat4(1);
@@ -536,11 +507,19 @@ int main( )
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Refri.Draw(lightingShader);
 
+        model = glm::mat4(1);
+        model = glm::translate(model, glm::vec3(-8.0f, -5.8f, -6.0f));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        LamparaTecho.Draw(lightingShader);
+
+        model = glm::mat4(1);
+        model = glm::translate(model, posIniP+glm::vec3(movPizzaX,movPizzaY,movPizzaZ));
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        Pizza.Draw(lightingShader);
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         model = glm::mat4(1);
-        /*model = glm::scale(model, glm::vec3(1.0f));*/
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         Casa.Draw(lightingShader);
         glEnable(GL_BLEND);
@@ -564,21 +543,6 @@ int main( )
         glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
         // Draw the light object (using light's vertex attributes)
         glBindVertexArray(lightVAO);
-        for (GLuint i = 0; i < 4; i++)
-        {
-            model = glm::mat4(1);
-            model = glm::translate(model, pointLightPositions[i]);
-            model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
-            glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-        glBindVertexArray(0);
-
-
-
-
-
-
         // Swap the screen buffers
         glfwSwapBuffers(window);
     }
@@ -642,6 +606,114 @@ void animacion()
             rotVent2 += 0.1;
     }
 
+    if (circuitoP)
+    {
+        if (recorridoP1)
+        {
+            movPizzaX += 0.1f;
+            if (movPizzaX > 6)
+            {
+                recorridoP1 = false;
+                recorridoP2 = true;
+            }
+        }
+
+        if (recorridoP2)
+        {
+            
+            movPizzaY += 0.1f;
+            if (movPizzaY > 4)
+            {
+                recorridoP2 = false;
+                recorridoP3 = true;
+            }
+        }
+
+        if (recorridoP3)
+        {
+            movPizzaZ += 0.1f;
+            if (movPizzaZ > 17.0f)
+            {
+                recorridoP3 = false;
+                recorridoP4 = true;
+
+            }
+        }
+
+        
+
+        if (recorridoP4)
+        {
+            movPizzaY -= 0.1f;
+            if (movPizzaY < 0.3f)
+            {
+                recorridoP4 = false;
+                recorridoP5 = true;
+            }
+        }
+    }
+
+    if (circuitoC)
+    {
+        if (recorridoC1)
+        {
+            movCZ -= 0.1f;
+            movCY = 10 * glm::sin(0.5 * movCZ);
+            if (movCZ < -30.0f)
+            {
+                recorridoC1 = false;
+                recorridoC2 = true;
+            }
+        }
+        if (recorridoC2)
+        {
+            rotC = 90;
+            movCX -= 0.1f;
+            movCY = 10 * glm::sin(0.5 * movCX);
+            if (movCX <-30.0f)
+            {
+                recorridoC2 = false;
+                recorridoC3 = true;
+
+            }
+        }
+
+        if (recorridoC3)
+        {
+            rotC = 180;
+            movCZ += 0.1f;
+            movCY = 10 * glm::sin(0.5 * movCZ);
+            if (movCZ > 0)
+            {
+                recorridoC3 = false;
+                recorridoC4 = true;
+            }
+        }
+
+        if (recorridoC4)
+        {
+            rotC = 270;
+            movCX += 0.1f;
+            movCY = 10 * glm::sin(0.5 * movCX);
+            if (movCX > 0)
+            {
+                recorridoC4 = false;
+                recorridoC5 = true;
+            }
+        }
+        if (recorridoC5)
+        {
+            rotC = 0;
+            movCZ += 0.1f;
+            if (movCZ > 0)
+            {
+                recorridoC5 = false;
+                recorridoC1 = true;
+            }
+        }
+
+    }
+    
 }
 
 
@@ -717,14 +789,37 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
             
         else {
             LightP2 = glm::vec3(0.0f, 0.0f, 0.0f);
-        }
-            
+        }         
     }
 
     if (keys[GLFW_KEY_3])
-        activeVent1 = !activeVent1;
+    {
+        activeLuz3 = !activeLuz3;
+        if (activeLuz3) {
+            LightP3 = glm::vec3(0.984f, 0.992f, 0.427f);
+        }
+
+        else {
+            LightP3 = glm::vec3(0.0f, 0.0f, 0.0f);
+        }
+    }
 
     if (keys[GLFW_KEY_4])
+    {
+        activeLuz4 = !activeLuz4;
+        if (activeLuz4) {
+            LightP4 = glm::vec3(0.984f, 0.992f, 0.427f);
+        }
+
+        else {
+            LightP4 = glm::vec3(0.0f, 0.0f, 0.0f);
+        }
+    }
+
+    if (keys[GLFW_KEY_5])
+        activeVent1 = !activeVent1;
+
+    if (keys[GLFW_KEY_6])
         activeVent2 = !activeVent2;
 
     if (keys[GLFW_KEY_KP_ADD]) {
@@ -784,5 +879,10 @@ void DoMovement()
     {
         camera.ProcessKeyboard(RIGHT, deltaTime);
     }
+
+    if (keys[GLFW_KEY_Q])
+        circuitoP = !circuitoP;
+    if (keys[GLFW_KEY_E])
+        circuitoC = !circuitoC;
 }
 
