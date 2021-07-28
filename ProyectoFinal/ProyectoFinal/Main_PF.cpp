@@ -37,7 +37,7 @@ const GLuint WIDTH = 1600, HEIGHT = 1200;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera
-Camera  camera(glm::vec3(25.0f, -10.0f, 0.0f));//50 -10 0
+Camera  camera(glm::vec3(50.0f, -10.0f, 0.0f));//50 -10 0
 GLfloat lastX = WIDTH ;
 GLfloat lastY = HEIGHT ;
 bool keys[1024];
