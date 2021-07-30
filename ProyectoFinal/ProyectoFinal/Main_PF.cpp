@@ -66,31 +66,6 @@ bool velocidad2 = false;
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 
-// Keyframes
-float posX = PosIni.x, posY = PosIni.y, posZ = PosIni.z, rotRodIzq = 0;
-
-#define MAX_FRAMES 9
-int i_max_steps = 190;
-int i_curr_steps = 0;
-typedef struct _frame
-{
-    //Variables para GUARDAR Key Frames
-    float posX;		//Variable para PosicionX
-    float posY;		//Variable para PosicionY
-    float posZ;		//Variable para PosicionZ
-    float incX;		//Variable para IncrementoX
-    float incY;		//Variable para IncrementoY
-    float incZ;		//Variable para IncrementoZ
-    float rotRodIzq;
-    float rotInc;
-
-}FRAME;
-
-FRAME KeyFrame[MAX_FRAMES];
-int FrameIndex = 0;			//introducir datos
-bool play = false;
-int playIndex = 0;
-
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
     glm::vec3(7.0f, -8.5f, 9.0f),
@@ -129,44 +104,6 @@ float movCX = 0.0f;
 float movCZ = 0.0f;
 float movCY = 0.0f;
 float rotC  = 0.0f;
-
-void saveFrame(void)
-{
-
-    printf("frameindex %d\n", FrameIndex);
-
-    KeyFrame[FrameIndex].posX = posX;
-    KeyFrame[FrameIndex].posY = posY;
-    KeyFrame[FrameIndex].posZ = posZ;
-
-    KeyFrame[FrameIndex].rotRodIzq = rotRodIzq;
-
-
-    FrameIndex++;
-}
-
-void resetElements(void)
-{
-    posX = KeyFrame[0].posX;
-    posY = KeyFrame[0].posY;
-    posZ = KeyFrame[0].posZ;
-
-    rotRodIzq = KeyFrame[0].rotRodIzq;
-
-}
-
-void interpolation(void)
-{
-
-    KeyFrame[playIndex].incX = (KeyFrame[playIndex + 1].posX - KeyFrame[playIndex].posX) / i_max_steps;
-    KeyFrame[playIndex].incY = (KeyFrame[playIndex + 1].posY - KeyFrame[playIndex].posY) / i_max_steps;
-    KeyFrame[playIndex].incZ = (KeyFrame[playIndex + 1].posZ - KeyFrame[playIndex].posZ) / i_max_steps;
-
-    KeyFrame[playIndex].rotInc = (KeyFrame[playIndex + 1].rotRodIzq - KeyFrame[playIndex].rotRodIzq) / i_max_steps;
-
-}
-
-
 
 int main( )
 {
@@ -559,40 +496,6 @@ int main( )
 void animacion()
 {
 
-    //Movimiento del personaje
-
-    if (play)
-    {
-        if (i_curr_steps >= i_max_steps) //end of animation between frames?
-        {
-            playIndex++;
-            if (playIndex > FrameIndex - 2)	//end of total animation?
-            {
-                printf("termina anim\n");
-                playIndex = 0;
-                play = false;
-            }
-            else //Next frame interpolations
-            {
-                i_curr_steps = 0; //Reset counter
-                                  //Interpolation
-                interpolation();
-            }
-        }
-        else
-        {
-            //Draw animation
-            posX += KeyFrame[playIndex].incX;
-            posY += KeyFrame[playIndex].incY;
-            posZ += KeyFrame[playIndex].incZ;
-
-            rotRodIzq += KeyFrame[playIndex].rotInc;
-
-            i_curr_steps++;
-        }
-
-    }
-
     if (activeVent1) {
         if (velocidad1)
             rotVent1 += 0.05;
@@ -720,35 +623,6 @@ void animacion()
 // Is called whenever a key is pressed/released via GLFW
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-    if (keys[GLFW_KEY_L])
-    {
-        if (play == false && (FrameIndex > 1))
-        {
-
-            resetElements();
-            //First Interpolation				
-            interpolation();
-
-            play = true;
-            playIndex = 0;
-            i_curr_steps = 0;
-        }
-        else
-        {
-            play = false;
-        }
-
-    }
-
-    if (keys[GLFW_KEY_K])
-    {
-        if (FrameIndex < MAX_FRAMES)
-        {
-            saveFrame();
-        }
-
-    }
-
 
     if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action)
     {
